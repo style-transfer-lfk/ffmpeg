@@ -128,7 +128,7 @@ $(PROGS): %$(PROGSSUF)$(EXESUF): %$(PROGSSUF)_g$(EXESUF)
 	$(STRIP) $@
 
 %$(PROGSSUF)_g$(EXESUF): %.o $(FF_DEP_LIBS)
-	$(LD) $(LDFLAGS) $(LDEXEFLAGS) -L/home/vagrant/tensorflow/tensorflow/contrib/makefile/gen/protobuf-host/lib -Wl,--allow-multiple-definition -Wl,--whole-archive /home/vagrant/tensorflow/tensorflow/contrib/makefile/gen/lib/libtensorflow-core.a -Wl,--no-whole-archive -lstdc++ -lprotobuf -ldl $(LD_O) $(OBJS-$*) $(FF_EXTRALIBS)
+	$(LD) $(LDFLAGS) $(LDEXEFLAGS) -L$(HOME)/tensorflow/tensorflow/contrib/makefile/gen/protobuf-host/lib -Wl,--allow-multiple-definition -Wl,--whole-archive $(HOME)/tensorflow/tensorflow/contrib/makefile/gen/lib/libtensorflow-core.a -Wl,--no-whole-archive -lstdc++ -lprotobuf -ldl $(LD_O) $(OBJS-$*) $(FF_EXTRALIBS)
 
 OBJDIRS += tools
 
