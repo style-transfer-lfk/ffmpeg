@@ -73,7 +73,7 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     }
     av_frame_copy_props(out, in);
 
-    tf_transfer(rgb24[0]);
+    tf_transfer(rgb24[0], inlink->w, inlink->h);
 
     sws_ctx = sws_getContext(
             inlink->w,
