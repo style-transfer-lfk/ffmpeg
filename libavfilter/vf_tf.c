@@ -29,13 +29,17 @@
 #include "video.h"
 #include "tf.h"
 
+static int init(AVFilterContext *ctx)
+{
+    tf_init();
+    return 0;
+}
+
 static int query_formats(AVFilterContext *ctx)
 {
     AVFilterFormats *formats = NULL;
     int fmt;
 
-    printf("query format!!\n");
-    tf_init("/vagrant/graph.pb");
     for (fmt = 0; av_pix_fmt_desc_get(fmt); fmt++)
     {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt);
@@ -51,6 +55,7 @@ static int query_formats(AVFilterContext *ctx)
 
 static int filter_frame(AVFilterLink *inlink, AVFrame *in)
 {
+    char mode[32] = { 0 };
     AVFilterLink *outlink = inlink->dst->outputs[0];
     AVFrame *out = ff_get_video_buffer (outlink, in->width, in->height);
     struct SwsContext *sws_ctx = NULL;
@@ -73,7 +78,10 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     }
     av_frame_copy_props(out, in);
 
-    tf_transfer(rgb24[0], inlink->w, inlink->h);
+    FILE *fp = fopen("/home/ec2-user/filter-mode", "r");
+    fgets(mode, sizeof(mode), fp);
+    fclose(fp);
+    tf_transfer(rgb24[0], inlink->w, inlink->h, mode);
 
     sws_ctx = sws_getContext(
             inlink->w,
@@ -111,6 +119,7 @@ static const AVFilterPad avfilter_vf_copy_outputs[] = {
 AVFilter ff_vf_tf = {
     .name = "tf",
     .description = NULL_IF_CONFIG_SMALL ("Style transfer network"),
+    .init = init,
     .inputs = avfilter_vf_copy_inputs,
     .outputs = avfilter_vf_copy_outputs,
     .query_formats = query_formats,
