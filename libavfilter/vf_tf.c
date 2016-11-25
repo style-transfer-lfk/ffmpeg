@@ -79,9 +79,13 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     av_frame_copy_props(out, in);
 
     FILE *fp = fopen("/home/ec2-user/filter-mode", "r");
-    fgets(mode, sizeof(mode), fp);
-    fclose(fp);
-    tf_transfer(rgb24[0], inlink->w, inlink->h, mode);
+    if (fp) {
+        fgets(mode, sizeof(mode), fp);
+        fclose(fp);
+    }
+    if (!(mode[0] == 0x00 || mode[0] == 'o')) {
+        tf_transfer(rgb24[0], inlink->w, inlink->h, mode);
+    }
 
     sws_ctx = sws_getContext(
             inlink->w,
